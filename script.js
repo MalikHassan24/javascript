@@ -1,37 +1,71 @@
-const taskInput = document.querySelector('#taskInput');
-const taskList = document.querySelector('#taskList');
-const addTaskBtn = document.querySelector('#addTaskBtn');
+const input = document.querySelector('input[type="text"]');
+const buttons = document.querySelectorAll('.button');
 
-addTaskBtn.addEventListener('click',addTask);
 
-function addTask() 
+let currentInput = '';
+let previousValue ='';
+let operator = '';
+let shouldResetInput= false;
+
+buttons.forEach(button =>
 {
-    const taskValue = taskInput.value;
+    button.addEventListener('click',()=>
+    {
+         const value = button.textContent;
 
+         if(value >= '0' && value <= '9' || value==='.')
+        {
+            if(shouldResetInput)
+            { 
+                currentInput = '';
+                shouldResetInput = false;
+            }
 
-if (taskValue === '')
-{
-    alert('please enter a task');
-    return;
-}
+            currentInput += value;
+            input.value = currentInput;
+        }
 
-const li = document.createElement('li');
-li.innerHTML = taskValue;
+        else if (value === '+' || value === '-' || value === '*' || value === '/')
+        {
+            if(currentInput !== '')
+            {
+                previousValue = currentInput;
+                operator = value;
+                currentInput = '';
+            }
+        }
 
-const deleteBtn = document.createElement('button');
-deleteBtn.innerHTML = "delete";
-deleteBtn.style.marginLeft = '10px';
-
-deleteBtn.addEventListener('click', function()
-{
-    taskList.removeChild(li);
+        else if (value === '=')
+        {
+            if (  previousValue !== '' && currentInput !== '' && operator !== '')
+            {
+                const result = calculate(parseFloat(previousValue), parseFloat(currentInput), operator);
+                input.value = result;
+                currentInput = result.toString();
+                previousValue = '';
+                shouldResetInput = true;
+            }
+        }
+    });
 });
 
-li.appendChild(deleteBtn);
+function calculate(num1, num2,operator)
+{
+    switch(operator)
+    {
+        case '+':
+           return num1 + num2;
 
-taskList.appendChild(li);
+        case '-':
+           return num1 - num2;
 
-taskInput.value = '';;
+        case '*':
+           return num1 * num2;
+            
+        case '/':
+           return num1 / num2;    
 
+        default:
+           return num2;   
+    }
 }
-
